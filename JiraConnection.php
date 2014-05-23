@@ -19,7 +19,6 @@ class JiraConnection {
 
   public function jql_query($jql) {
     if (is_string($jql)) {
-      // replace @ with \\u0040, as @ is a reserved character in jql
       $request = 'jql=' . trim($jql);
       $request = preg_replace('/\s+/', '+', $request);
 
@@ -39,7 +38,6 @@ class JiraConnection {
    *   the user's responsibility to wrap these in a string.
    */
   public function request($request) {
-    error_log("request = " . $request);
     $ch = curl_init();
     curl_setopt_array($ch,
      array(
@@ -49,8 +47,6 @@ class JiraConnection {
           ),
         CURLOPT_URL => $this->host . '/rest/api/latest/search?' . $request,
         CURLOPT_RETURNTRANSFER => 1,
-        // CURLOPT_FAILONERROR => TRUE,
-        // CURLOPT_USERPWD => "'" . $this->user . ":" . $this->pass . "'",
       ));
     if (!$this->response = curl_exec($ch)) {
       throw new Exception("Unable to process Jira JQL request: " . curl_error($ch));
@@ -60,7 +56,6 @@ class JiraConnection {
       throw new Exception("Able to reach Jira, but there was a problem with the request: " . print_r($response->errorMessages, 1));
     }
 
-    error_log($this->host . '/rest/api/2/search?' . $request);
     curl_close($ch);
   }
 
@@ -87,11 +82,9 @@ class JiraConnection {
 
     foreach ($results as $item) {
       $html .= "<tr>";
-
       foreach ($item as $field) {
         $html .= '<td>' . $field . '</td>';
       }
-
       $html .= "</tr>";
     }
 
